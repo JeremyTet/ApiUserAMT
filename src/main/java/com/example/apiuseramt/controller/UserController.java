@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -59,14 +60,17 @@ public class UserController {
 
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(String name, String email, String password) {
+    public ResponseEntity<?> register(String name, String email, String password, String description) {
         //TODO: check si user n'existe pas
         System.out.println(name);
         System.out.println(email);
         System.out.println(password);
+        System.out.println(description);
+
         try {
             User newUser = new User(
                     name,
+                    description,
                     email,
                     encoder.encode(password)
             );
@@ -81,5 +85,46 @@ public class UserController {
                     HttpStatus.BAD_REQUEST);
         }
     }
+    @PutMapping("/update")
+    public ResponseEntity<?>updateUser(Long id, String name, String description) throws IOException{
 
+        Optional<User> opt = userRepository.findById(id);
+        if(opt.isPresent()){
+            User currentUser = opt.get();
+            currentUser.setName(name);
+            currentUser.setDescription(description);
+            userRepository.save(currentUser);
+            return new ResponseEntity<>("ok",
+                    HttpStatus.BAD_REQUEST);
+        }else{
+            return new ResponseEntity<>("No ok update fail",
+                    HttpStatus.BAD_REQUEST);
+        }
+
+
+    }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<?>deleteUser(Long id) throws IOException{
+
+        Optional<User> user = userRepository.findById(id);
+        if (user.isPresent()) {
+            try {
+                userRepository.delete(user.get());
+                return new ResponseEntity<>(
+                        "c'est ok",
+                        HttpStatus.OK
+                );
+            } catch (
+                    Exception e) {
+                System.out.println(e);
+                return new ResponseEntity<>("No ok",
+                        HttpStatus.BAD_REQUEST);
+            }
+
+        } else {
+            return new ResponseEntity<>("L'user n'existe pas",
+                    HttpStatus.BAD_REQUEST);
+        }
+    }
 }

@@ -15,13 +15,16 @@ public class UserAuthImpl implements UserDetails  {
     private String password;
     private String name;
 
+    private String description;
+
     public Collection<? extends GrantedAuthority> authorities;
 
-    public UserAuthImpl(Long id, String name, String email, String password) {
+    public UserAuthImpl(Long id, String name, String email, String password, String description) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.password = password;
+        this.description = description;
     }
 
     public static UserAuthImpl build(User admin) {
@@ -29,7 +32,9 @@ public class UserAuthImpl implements UserDetails  {
                 admin.getId(),
                 admin.getName(),
                 admin.getEmail(),
-                admin.getPassword()
+                admin.getPassword(),
+                admin.getDescription()
+
         );
     }
 
